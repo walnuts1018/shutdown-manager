@@ -16,7 +16,6 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/phsym/console-slog"
 	"github.com/walnuts1018/shutdown-manager/config"
-	appConfig "github.com/walnuts1018/shutdown-manager/config"
 	"github.com/walnuts1018/shutdown-manager/tracer"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho"
 )
@@ -25,7 +24,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, os.Interrupt, os.Kill)
 	defer stop()
 
-	cfg, err := appConfig.Load()
+	cfg, err := config.Load()
 	if err != nil {
 		slog.ErrorContext(ctx, "Failed to load config", slog.String("error", err.Error()))
 		os.Exit(1)
@@ -88,7 +87,7 @@ func createLogger(logLevel slog.Level, logType config.LogType) *slog.Logger {
 	return slog.New(hander)
 }
 
-func newRouter(cfg *config.Config) *echo.Echo {
+func newRouter() *echo.Echo {
 	e := echo.New()
 
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
@@ -121,8 +120,10 @@ func skipper(c echo.Context) bool {
 	return c.Path() == "/livez" || c.Path() == "/readyz"
 }
 
-func shutdown() error {
-	cmd := exec.Command("systemctl", "poweroff", "-i")
+func shutdown(ctx context.Context) error {
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "systemctl", "poweroff", "-i")
 	stdout := new(bytes.Buffer)
 	stderr := new(bytes.Buffer)
 	cmd.Stdout = stdout
