@@ -40,7 +40,7 @@ func main() {
 	}
 	defer closeTracer()
 
-	e := newRouter(cfg)
+	e := newRouter()
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%s", cfg.Port),
@@ -106,7 +106,7 @@ func newRouter() *echo.Echo {
 	}).Name = "health.readiness"
 
 	e.POST("/shutdown", func(c echo.Context) error {
-		if err := shutdown(); err != nil {
+		if err := shutdown(c.Request().Context()); err != nil {
 			slog.Error("Failed to shutdown", slog.String("error", err.Error()))
 			return c.String(http.StatusInternalServerError, "failed to shutdown")
 		}
