@@ -1,11 +1,11 @@
 module github.com/walnuts1018/shutdown-manager
 
-go 1.25.1
+go 1.26.0
 
 tool github.com/golangci/golangci-lint/v2/cmd/golangci-lint
 
 require (
-	github.com/caarlos0/env/v11 v11.3.1
+	github.com/caarlos0/env/v11 v11.4.2
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.13.4
