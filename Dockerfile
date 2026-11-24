@@ -15,7 +15,7 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=cache,target=/root/.cache/go-build,sharing=locked \
     GOOS=linux go build -o shutdown-manager -tags $BUILD_TAGS $ROOT && chmod +x ./shutdown-manager
 
-FROM debian:13.1-slim
+FROM debian:13.8-slim@sha256:8aa5a7bf5a1955bddbe7d74fcdd0b91ab30e74362a8b73af672b0481b35b44a0
 WORKDIR /app
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
